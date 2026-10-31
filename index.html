@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Подберём решение для вашей задачи — Ирина Ваганова</title>
+  <meta name="theme-color" content="#131313">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23131313'/%3E%3Ctext x='32' y='43' text-anchor='middle' fill='%23D4AF37' font-size='34' font-family='sans-serif'%3EИ%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Unbounded:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: dark; --bg: #131313; --surface: #1c1c1c; --card: #242424; --gold: #D4AF37; --text: #f5f5f5; --muted: #b5b5b0; --line: #383835; --radius: 16px; --display: 'Unbounded', sans-serif; --sans: 'Inter', sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; min-height: 100vh; }
+    ::selection { background: var(--gold); color: var(--bg); }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { font-family: var(--display); font-weight: 500; line-height: 1.3; }
+    a, button { text-decoration: none; color: inherit; cursor: pointer; transition: .2s; font: inherit; }
+    button { border: none; background: none; padding: 0; }
+    input, textarea, select { width: 100%; background: var(--bg); color: var(--text); border: 1px solid #5a5a54; border-radius: 10px; padding: 12px 14px; font: inherit; transition: border-color .2s; font-size: 16px; /* Для мобильных без зума */ }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--gold); }
+    input[aria-invalid="true"] { border-color: #ff5c5c; }
+    textarea { resize: vertical; min-height: 80px; }
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23b5b5b0'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; background-size: 16px; padding-right: 40px; }
+    
+    .header { padding: 20px 0; border-bottom: 1px solid var(--line); background: var(--surface); }
+    .wrap { width: min(1000px, calc(100% - 40px)); margin-inline: auto; }
+    .brand { display: flex; align-items: center; gap: 12px; font-family: var(--display); font-size: 14px; }
+    .brand-mark { display: grid; place-items: center; width: 32px; height: 32px; color: var(--gold); border: 1px solid #72602c; border-radius: 50%; font-size: 11px; }
+    
+    .main { flex: 1; padding: 60px 0; }
+    .wizard-header { margin-bottom: 40px; text-align: center; }
+    .step-indicator { font-size: 12px; color: var(--gold); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px; display: block; font-weight: 600; }
+    .wizard-header h1 { font-size: 28px; margin-bottom: 12px; }
+    .wizard-header p { color: var(--muted); max-width: 600px; margin: 0 auto; }
+    
+    .step { display: none; animation: fadeIn 0.4s ease; }
+    .step.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Шаг 1: Выбор */
+    .path-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 30px; }
+    .path-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; text-align: left; transition: border-color .2s, transform .2s; }
+    .path-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .path-card h3 { font-size: 16px; margin-bottom: 8px; color: var(--gold); }
+    .path-card p { font-size: 13px; color: var(--muted); }
+
+    /* Шаг 2 и 3: Лейаут */
+    .step-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+    .form-group { margin-bottom: 24px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .help-text { font-size: 11px; color: var(--muted); margin-top: 6px; }
+    .demo-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; position: sticky; top: 20px; }
+    .demo-box h4 { font-family: var(--sans); font-weight: 600; font-size: 14px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    .demo-box h4 span { font-size: 10px; padding: 3px 8px; border: 1px solid var(--gold); color: var(--gold); border-radius: 4px; letter-spacing: 0.05em; }
+    
+    /* Стили для конкретных демо */
+    .demo-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 13px; }
+    .demo-row input { width: 130px; padding: 8px 10px; font-size: 16px; }
+    .demo-result { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .demo-result .val { font-family: var(--display); font-size: 22px; color: var(--gold); display: block; margin-top: 4px; word-break: break-word; }
+    
+    /* Шаг 3: Итог */
+    .solution-card { background: var(--card); border: 1px solid var(--gold); border-radius: var(--radius); padding: 32px; }
+    .solution-card h3 { font-size: 22px; margin-bottom: 24px; }
+    .sol-block { margin-bottom: 20px; }
+    .sol-block span { display: block; font-size: 12px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; font-weight: 600; }
+    .sol-block p { font-size: 14px; word-break: break-word; }
+    .budget-block { background: var(--bg); border: 1px solid var(--line); padding: 16px; border-radius: 12px; margin-top: 24px; }
+    .budget-block .val { font-family: var(--display); font-size: 20px; color: var(--text); display: block; margin: 4px 0 8px; font-weight: 400; text-transform: none; letter-spacing: 0; }
+    .budget-block .muted { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    
+    .message-preview { background: var(--bg); border: 1px dashed var(--line); padding: 16px; border-radius: 10px; font-size: 13px; color: var(--muted); margin-bottom: 16px; min-height: 120px; outline: none; word-break: break-word; }
+    
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 24px; border: 1px solid var(--line); border-radius: 10px; font-size: 14px; font-weight: 600; background: transparent; }
+    .btn:hover { border-color: var(--gold); color: var(--gold); }
+    .btn.primary { background: var(--gold); border-color: var(--gold); color: #131313; }
+    .btn.primary:hover { background: #e9c85e; border-color: #e9c85e; }
+    
+    .nav-buttons { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--line); }
+    
+    .about-snippet { margin-top: 30px; font-size: 12px; color: var(--muted); line-height: 1.6; border-top: 1px solid var(--line); padding-top: 20px; }
+    
+    .error-text { color: #ff5c5c; font-size: 11px; margin-top: 6px; display: none; }
+    input[aria-invalid="true"] ~ .error-text { display: block; }
+    
+    @media(max-width: 768px) {
+      .path-grid, .step-layout { grid-template-columns: 1fr; gap: 24px; }
+      .wizard-header h1 { font-size: 22px; }
+      .nav-buttons { flex-direction: column-reverse; gap: 12px; }
+      .nav-buttons .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="wrap">
+      <div class="brand"><span class="brand-mark">ИВ</span>Ирина Ваганова</div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="wrap" id="wizard-container">
+      
+      <div class="wizard-header" id="wizard-header">
+        <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Ваш выбор. Моё предложение.</div>
+        <span class="step-indicator" id="step-indicator">Шаг 1 из 3 · Выберем задачу</span>
+        <h1 id="step-title" tabindex="-1">А что, если<br>сделать вашу работу проще?</h1>
+        <p id="step-desc">От расчётов и документов до сайта для ваших клиентов. Выберите свою задачу, попробуйте примеры и посмотрите, с какого решения и бюджета можно начать.</p>
+      </div>
+
+      <!-- ШАГ 1: ВЫБОР -->
+      <div class="step active" id="step-1">
+        <p style="text-align: center; margin-bottom: 20px; font-weight: 500;">Что хочется изменить в первую очередь?</p>
+        <div class="path-grid">
+          <button class="path-card" onclick="selectPath('tables')">
+            <h3>Упростить расчёты</h3>
+            <p>Собрать данные в одном месте, разобраться в цифрах и получать нужный результат без постоянного копирования между файлами.</p>
+          </button>
+          <button class="path-card" onclick="selectPath('automation')">
+            <h3>Освободить время</h3>
+            <p>Документы, выгрузки, одинаковые действия изо дня в день. Посмотрим, какую часть этой работы можно передать инструменту.</p>
+          </button>
+          <button class="path-card" onclick="selectPath('web')">
+            <h3>Сделать удобный сайт</h3>
+            <p>Чтобы клиентам было проще понять ваши услуги, выбрать нужное и связаться с вами. А команде — пользоваться рабочим сервисом.</p>
+          </button>
+          <button class="path-card" onclick="selectPath('unknown')">
+            <h3>Разобраться вместе</h3>
+            <p>Есть ощущение, что можно удобнее, но пока непонятно как? Начнём с вашей ситуации и подберём подходящий формат.</p>
+          </button>
+        </div>
+      </div>
+
+      <!-- ШАГ 2: ВОПРОСЫ И ДЕМО -->
+      <div class="step" id="step-2">
+        <div class="step-layout">
+          <div>
+            <div class="questions" id="dynamic-questions">
+              <!-- Инжекция вопросов -->
+            </div>
+            <p class="help-text" style="margin-top: 16px;">Коротких ответов достаточно. Если чего-то пока не знаете, уточним при обсуждении.</p>
+          </div>
+          <div class="demo-area" id="dynamic-demo">
+            <!-- Инжекция демо -->
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <button class="btn" onclick="goStep(1)">← Выбрать другую задачу</button>
+          <button class="btn primary" onclick="generateSolution()">Посмотреть вариант решения →</button>
+        </div>
+      </div>
+
+      <!-- ШАГ 3: РЕШЕНИЕ И БЮДЖЕТ -->
+      <div class="step" id="step-3">
+        <div class="solution-card">
+          <h3 tabindex="-1" id="step3-heading">Вариант для вашей задачи</h3>
+          <div class="step-layout">
+            <div>
+              <div class="sol-block">
+                <span>Что хочется изменить</span>
+                <p id="res-task">-</p>
+              </div>
+              
+              <div class="budget-block" style="margin-top: 0; margin-bottom: 24px;">
+                <span>На какой бюджет ориентироваться</span>
+                <span class="val" id="res-budget">-</span>
+                <p class="muted" id="res-budget-scope">-</p>
+                <p class="muted" style="margin-top: 8px;" id="budget-disclaimer">Ориентир относится к указанному объёму. Если понадобятся дополнительные функции или подключения, оценим их отдельно. До начала работы зафиксируем состав результата и стоимость.</p>
+              </div>
+
+              <div class="sol-block">
+                <span>Как это может работать</span>
+                <p id="res-mechanics">-</p>
+              </div>
+              <div class="sol-block">
+                <span>Что ещё обсудим</span>
+                <p id="res-needs">-</p>
+              </div>
+            </div>
+            
+            <div>
+              <div class="demo-box" style="background: var(--bg);">
+                <h4>Обсудим, как это будет работать у вас?</h4>
+                <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px;">
+                  Короткое сообщение уже готово. Скопируйте его, откройте удобный мессенджер и отправьте мне. Уточним детали и поймём, какой объём решения вам подойдёт.
+                </p>
+                <label for="message-out">С этим можно начать разговор</label>
+                <textarea id="message-out" class="message-preview" readonly></textarea>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <button class="btn primary" style="width: 100%" onclick="copyAndAlert()">Скопировать сообщение</button>
+                  <div style="display: flex; gap: 10px;">
+                    <a href="https://t.me/Kirra1302" target="_blank" class="btn" style="flex: 1; padding: 10px; font-size: 13px;">Telegram ↗</a>
+                    <a href="https://max.ru/u/f9LHodD0cOJSQMGqztGALsBOoeMFRcf26KDBHDppL2Y_XD-yQovaysBUWu4" target="_blank" class="btn" style="flex: 1; padding: 10px; font-size: 13px;">MAX ↗</a>
+                  </div>
+                </div>
+                <p id="copy-status" style="font-size: 12px; color: var(--gold); margin-top: 12px; min-height: 18px;" aria-live="polite"></p>
+                
+                <div class="about-snippet">
+                  <strong>Об опыте:</strong> Более 15 лет самостоятельно веду бухгалтерский и налоговый учёт. Знаю, как устроены документы, расчёты и повседневные рабочие процессы. Поэтому при выборе инструмента смотрю на то, как им будут пользоваться в реальной работе.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="nav-buttons" style="justify-content: flex-start;">
+          <button class="btn" onclick="goStep(2)">← Уточнить мои ответы</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const pathsData = {
+      tables: {
+        title: "Какие цифры хочется держать под рукой?",
+        desc: "Прибыль по проектам, оплаты, остатки или сводный отчёт — расскажите, что нужно видеть и где сейчас находятся данные.",
+        questions: `
+          <div class="form-group">
+            <label for="q1">Что нужно рассчитывать или собирать в отчёт?</label>
+            <textarea id="q1" placeholder="Например: хочу видеть прибыль по каждому проекту или собирать продажи из нескольких файлов в один отчёт."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="q2">Откуда сейчас берутся данные?</label>
+            <input type="text" id="q2" placeholder="Например: из Excel, Google Таблиц, 1С или выгрузок из CRM.">
+          </div>
+          <div class="form-group">
+            <label for="q-scope">С чего планируем начать?</label>
+            <select id="q-scope">
+              <option value="" disabled selected>Выберите формат</option>
+              <option value="modify">Доработать готовую таблицу</option>
+              <option value="new">Создать новую таблицу или отчёт</option>
+              <option value="calc">Сделать веб-калькулятор</option>
+              <option value="unknown">Пока не знаю — обсудим</option>
+            </select>
+          </div>
+        `,
+        demo: `
+          <div class="demo-box">
+            <h4>Меняете данные — видите результат <span>ДЕМО</span></h4>
+            <p style="font-size: 12px; color: var(--muted); margin-bottom: 16px;">Попробуйте изменить доход или расходы. Разница пересчитается сразу. В вашем инструменте показатели и правила будут соответствовать вашей задаче.</p>
+            <div class="demo-row">
+              <label for="demo-rev">Доход, ₽</label>
+              <input type="number" id="demo-rev" value="150000" min="0" step="any" max="1000000000000">
+            </div>
+            <div class="demo-row">
+              <label for="demo-cost">Расходы, ₽</label>
+              <input type="number" id="demo-cost" value="80000" min="0" step="any" max="1000000000000">
+            </div>
+            <div class="demo-result">
+              <span style="font-size: 12px; color: var(--muted)">Разница между доходом и расходами:</span>
+              <span class="val" id="demo-profit" aria-live="polite">70 000 ₽</span>
+            </div>
+          </div>
+        `,
+        demoLogic: () => {
+          const update = () => {
+            const rEl = document.getElementById('demo-rev');
+            const cEl = document.getElementById('demo-cost');
+            const r = Number(rEl.value);
+            const c = Number(cEl.value);
+            
+            // Валидация
+            let invalid = false;
+            if (rEl.value !== '' && (r < 0 || isNaN(r) || !isFinite(r) || r > 1000000000000)) { rEl.setAttribute('aria-invalid', 'true'); invalid = true; } else { rEl.removeAttribute('aria-invalid'); }
+            if (cEl.value !== '' && (c < 0 || isNaN(c) || !isFinite(c) || c > 1000000000000)) { cEl.setAttribute('aria-invalid', 'true'); invalid = true; } else { cEl.removeAttribute('aria-invalid'); }
+            
+            const out = document.getElementById('demo-profit');
+            if (invalid || rEl.value === '' || cEl.value === '') {
+              out.textContent = '—';
+            } else {
+              out.textContent = new Intl.NumberFormat('ru-RU').format(r - c) + ' ₽';
+            }
+          };
+          document.getElementById('demo-rev').addEventListener('input', update);
+          document.getElementById('demo-cost').addEventListener('input', update);
+        },
+        solution: {
+          mech: "Сначала определим, какие цифры вам нужны для работы и откуда их брать. Затем соберу таблицу или калькулятор с подходящими расчётами и проверками. Если нужно получать данные из других файлов или систем, отдельно посмотрим, как это лучше организовать.",
+          needs: "Посмотрим пример текущих данных, уточним правила расчёта и желаемый результат. Также важно понять, кто будет пользоваться инструментом и как часто обновляется информация."
+        },
+        getBudget: (scopeVal) => {
+          if (scopeVal === 'modify') return { range: '3 000 – 7 000 ₽', scope: 'Для исправления расчётов, структуры или небольшой части логики в вашей готовой таблице.' };
+          if (scopeVal === 'new') return { range: '7 000 – 20 000 ₽', scope: 'Для одного реестра или отчёта с формулами и проверками, который создаётся под вашу задачу.' };
+          if (scopeVal === 'calc') return { range: '8 000 – 20 000 ₽', scope: 'Для одного интерактивного расчёта по согласованным правилам.' };
+          return { range: 'Индивидуальная оценка', scope: 'Определим подходящий формат и его стоимость после знакомства с вашей ситуацией.' };
+        }
+      },
+      automation: {
+        title: "Что хочется перестать делать вручную?",
+        desc: "Начнём с одного повторяющегося действия. Разберём, что происходит сейчас и какой результат вы хотите получать.",
+        questions: `
+          <div class="form-group">
+            <label for="q1">Какая работа повторяется снова и снова?</label>
+            <textarea id="q1" placeholder="Например: переношу реквизиты в акты, объединяю выгрузки или каждый раз обрабатываю файлы по одному правилу."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="q2">Сколько часов одного человека уходит на это за неделю?</label>
+            <input type="number" id="q2" placeholder="Например: 8" min="0" step="any" max="168" aria-describedby="q2-error">
+            <p id="q2-error" class="error-text">Укажите от 0 до 168 часов или оставьте поле пустым.</p>
+            <p class="help-text">Приблизительной оценки достаточно. Если пока не знаете, оставьте поле пустым.</p>
+          </div>
+          <div class="form-group">
+            <label for="q-scope">Нужно упростить одно действие или целую цепочку?</label>
+            <select id="q-scope">
+              <option value="" disabled selected>Выберите объём</option>
+              <option value="single">Одну операцию с файлами одного формата</option>
+              <option value="complex">Несколько связанных действий или разные форматы</option>
+              <option value="unknown">Пока не знаю — обсудим</option>
+            </select>
+          </div>
+        `,
+        demo: `
+          <div class="demo-box">
+            <h4>А если часть этого времени освободится? <span>УСЛОВНЫЙ ПРИМЕР</span></h4>
+            <p style="font-size: 12px; color: var(--muted); margin-bottom: 16px;">Посмотрите, как меняется оценка при вашем количестве часов. Это пример расчёта; возможный результат для вашей работы определим после знакомства с процессом.</p>
+            <div class="demo-result" style="border-top: none; padding-top: 0; margin-top: 0;">
+              <span style="font-size: 12px; color: var(--muted)">Время, которое можно высвободить за 4 недели при сокращении ручной работы на 60%:</span>
+              <span class="val" id="demo-saved" aria-live="polite">—</span>
+              <p style="font-size: 11px; color: var(--muted); margin-top: 8px;">60% — условное допущение для этого примера. Реальная доля зависит от задачи, исходных данных и необходимых проверок.</p>
+            </div>
+          </div>
+        `,
+        demoLogic: () => {
+          document.getElementById('q2').addEventListener('input', (e) => {
+            const input = e.target;
+            const h = Number(input.value);
+            const out = document.getElementById('demo-saved');
+            
+            if (input.value !== '' && (isNaN(h) || h < 0 || h > 168 || !isFinite(h))) {
+              input.setAttribute('aria-invalid', 'true');
+              out.textContent = '—';
+              return;
+            } else if (input.value === '') {
+              input.removeAttribute('aria-invalid');
+              out.textContent = '—';
+              return;
+            }
+            input.removeAttribute('aria-invalid');
+            const saved = Math.round(h * 4 * 0.6);
+            out.textContent = `≈ ${saved} ч`;
+          });
+        },
+        solution: {
+          mech: "Разберём ваши действия по шагам и определим, что можно передать инструменту. Это может быть заполнение документов, обработка файлов или обновление реестра. Согласуем, какие действия выполняются автоматически и где остаётся проверка человеком.",
+          needs: "Нужны пример исходных данных, ожидаемый результат и короткое описание ваших действий. Для первого обсуждения подойдёт обезличенный пример."
+        },
+        getBudget: (scopeVal) => {
+          if (scopeVal === 'single') return { range: '12 000 – 30 000 ₽', scope: 'Для одной повторяющейся операции: например, заполнения одного согласованного шаблона из подготовленных данных.' };
+          return { range: 'Индивидуальная оценка', scope: 'Посмотрим, как связаны действия, какие форматы используются и что должно получаться на выходе. По этим деталям определим объём и стоимость.' };
+        }
+      },
+      web: {
+        title: "Для кого сделаем удобнее?",
+        desc: "Кому-то нужно быстро разобраться в услугах. Кому-то — выбрать товар или выполнить расчёт. Начнём с человека, который будет пользоваться вашей страницей.",
+        questions: `
+          <div class="form-group">
+            <label for="q1">Кто будет пользоваться сайтом или сервисом?</label>
+            <input type="text" id="q1" placeholder="Например: новые клиенты, постоянные заказчики или сотрудники отдела продаж.">
+          </div>
+          <div class="form-group">
+            <label for="q2">Что этому человеку нужно сделать?</label>
+            <textarea id="q2" placeholder="Например: понять мои услуги и написать мне; выбрать позиции из каталога; рассчитать стоимость по заданным правилам."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="q-scope">Какой формат вам ближе?</label>
+            <select id="q-scope">
+              <option value="" disabled selected>Выберите формат</option>
+              <option value="landing">Одностраничный сайт с услугами и контактами</option>
+              <option value="app">Каталог, сервис или панель для команды</option>
+              <option value="unknown">Пока не знаю — обсудим</option>
+            </select>
+          </div>
+        `,
+        demo: `
+          <div class="demo-box">
+            <h4>Примерьте структуру страницы <span>ДЕМО</span></h4>
+            <p style="font-size: 12px; color: var(--muted); margin-bottom: 16px;">Отметьте блоки, которые хотите обсудить. Они появятся на схеме, а ваш выбор попадёт в сообщение для меня. Состав и стоимость функций согласуем отдельно.</p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+              <label style="display: flex; gap: 6px; align-items: center; background: var(--card); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); cursor: pointer;"><input type="checkbox" checked disabled> Верхний блок</label>
+              <label style="display: flex; gap: 6px; align-items: center; background: var(--card); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); cursor: pointer;"><input type="checkbox" id="w-calc"> Калькулятор</label>
+              <label style="display: flex; gap: 6px; align-items: center; background: var(--card); padding: 4px 8px; border-radius: 6px; border: 1px solid var(--line); cursor: pointer;"><input type="checkbox" id="w-form"> Форма обращения</label>
+            </div>
+            <div style="border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: var(--bg); display: flex; flex-direction: column; gap: 6px;">
+              <div style="height: 20px; background: #333; border-radius: 4px;"></div>
+              <div style="height: 40px; background: var(--surface); border-radius: 4px; display: grid; place-items: center; font-size: 10px; color: var(--muted)">Услуги и описание</div>
+              <div id="w-calc-view" style="display: none; height: 60px; border: 1px dashed var(--gold); border-radius: 4px; place-items: center; font-size: 10px; color: var(--gold)">Калькулятор</div>
+              <div id="w-form-view" style="display: none; height: 40px; background: #222; border-radius: 4px; place-items: center; font-size: 10px; color: var(--muted)">Форма обращения</div>
+            </div>
+          </div>
+        `,
+        demoLogic: () => {
+          document.getElementById('w-calc').addEventListener('change', (e) => {
+            document.getElementById('w-calc-view').style.display = e.target.checked ? 'grid' : 'none';
+          });
+          document.getElementById('w-form').addEventListener('change', (e) => {
+            document.getElementById('w-form-view').style.display = e.target.checked ? 'grid' : 'none';
+          });
+        },
+        solution: {
+          mech: "Определим, что посетителю важно увидеть и какое действие выполнить. Затем соберу структуру, оформление и нужные функции. Отдельно уточним размещение страницы и способ получения обращений, если он потребуется.",
+          needs: "Уточним аудиторию, главное действие и материалы, которые у вас уже есть. Для калькулятора понадобятся правила расчёта, для формы — понимание, куда должны поступать обращения."
+        },
+        getBudget: (scopeVal) => {
+          if (scopeVal === 'landing') return { range: '15 000 – 35 000 ₽', scope: 'Для адаптивной страницы с услугами, описанием и контактами. Дополнительные функции, включая калькулятор и обработку заявок, уточним отдельно.' };
+          return { range: 'Индивидуальная оценка', scope: 'Бюджет зависит от функций, пользователей и способа хранения данных. Сначала определим достаструю для вашей задачи вариант.' };
+        }
+      },
+      unknown: {
+        title: "Начнём с того, что сейчас неудобно",
+        desc: "Необязательно знать названия программ или заранее выбирать инструмент. Расскажите, что хочется изменить — разберёмся вместе.",
+        questions: `
+          <div class="form-group">
+            <label for="q1">В какой момент работа становится сложнее, чем хотелось бы?</label>
+            <textarea id="q1" rows="6" placeholder="Что вы делаете сейчас, где возникают трудности и какой результат хотите получать?"></textarea>
+            <p class="help-text">Можно начать с нескольких предложений. Остальное уточним в разговоре.</p>
+          </div>
+        `,
+        demo: `
+          <div class="demo-box">
+            <h4>От ситуации — к понятному следующему шагу</h4>
+            <ol style="font-size: 13px; color: var(--muted); padding-left: 16px; margin: 0; line-height: 1.8;">
+              <li>Вы рассказываете, что хотите изменить.</li>
+              <li>Уточняем, как работа устроена сейчас.</li>
+              <li>Я предлагаю подходящий формат и объясняю его логику.</li>
+              <li>Согласуем объём, стоимость и порядок работы.</li>
+            </ol>
+          </div>
+        `,
+        demoLogic: () => {},
+        solution: {
+          mech: "Начнём с вашей ситуации и желаемого результата. Возможно, достаточно доработать инструмент, который уже есть. Возможно, удобнее создать отдельную таблицу, страницу или небольшой сервис. Выберем вариант после обсуждения деталей.",
+          needs: "Для начала достаточно описать, что происходит сейчас и что хочется изменить. Можно написать, отправить голосовое или договориться о разговоре."
+        },
+        getBudget: () => ({ range: 'Индивидуальная оценка', scope: 'Определим подходящий формат и его стоимость после знакомства с вашей ситуацией.' })
+      }
+    };
+
+    let currentPath = '';
+    const drafts = {}; 
+    
+    function setStepIndicator(step) {
+      const titles = ["Выберем задачу", "Добавим детали", "Посмотрим, с чего начать"];
+      document.getElementById('step-indicator').textContent = `Шаг ${step} из 3 · ${titles[step-1]}`;
+    }
+
+    function saveDraft() {
+      if (!currentPath) return;
+      const q1 = document.getElementById('q1');
+      const q2 = document.getElementById('q2');
+      const qScope = document.getElementById('q-scope');
+      
+      const draft = {};
+      if (q1) draft.q1 = q1.value;
+      if (q2) draft.q2 = q2.value;
+      if (qScope) draft.scope = qScope.value;
+      
+      if (currentPath === 'web') {
+        const wCalc = document.getElementById('w-calc');
+        const wForm = document.getElementById('w-form');
+        if (wCalc) draft.wCalc = wCalc.checked;
+        if (wForm) draft.wForm = wForm.checked;
+      }
+      
+      drafts[currentPath] = draft;
+    }
+
+    function restoreDraft() {
+      if (!currentPath || !drafts[currentPath]) return;
+      const draft = drafts[currentPath];
+      
+      const q1 = document.getElementById('q1');
+      const q2 = document.getElementById('q2');
+      const qScope = document.getElementById('q-scope');
+      
+      if (q1 && draft.q1 !== undefined) q1.value = draft.q1;
+      if (q2 && draft.q2 !== undefined) q2.value = draft.q2;
+      if (qScope && draft.scope !== undefined) qScope.value = draft.scope;
+      
+      if (currentPath === 'web') {
+        const wCalc = document.getElementById('w-calc');
+        const wForm = document.getElementById('w-form');
+        if (wCalc && draft.wCalc !== undefined) {
+           wCalc.checked = draft.wCalc;
+           document.getElementById('w-calc-view').style.display = draft.wCalc ? 'grid' : 'none';
+        }
+        if (wForm && draft.wForm !== undefined) {
+           wForm.checked = draft.wForm;
+           document.getElementById('w-form-view').style.display = draft.wForm ? 'grid' : 'none';
+        }
+      }
+      
+      // Триггер событий ввода для пересчёта демо
+      if (q2) q2.dispatchEvent(new Event('input'));
+      if (currentPath === 'tables') {
+          document.getElementById('demo-rev').dispatchEvent(new Event('input'));
+      }
+    }
+
+    function selectPath(path) {
+      if (currentPath !== path) {
+        saveDraft(); // Сохраняем предыдущий черновик
+        currentPath = path;
+        const data = pathsData[path];
+        
+        document.getElementById('step-title').textContent = data.title;
+        document.getElementById('step-desc').textContent = data.desc;
+        
+        document.getElementById('dynamic-questions').innerHTML = data.questions;
+        document.getElementById('dynamic-demo').innerHTML = data.demo;
+        data.demoLogic();
+        restoreDraft(); // Восстанавливаем черновик для выбранного направления
+      }
+      goStep(2);
+    }
+
+    function goStep(step) {
+      document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+      document.getElementById(`step-${step}`).classList.add('active');
+      setStepIndicator(step);
+      document.getElementById('copy-status').textContent = ''; 
+      
+      const container = document.getElementById('wizard-container');
+      const offset = container.getBoundingClientRect().top + window.scrollY - 80;
+      
+      if (step === 1) {
+        document.getElementById('step-title').innerHTML = "А что, если<br>сделать вашу работу проще?";
+        document.getElementById('step-desc').textContent = "От расчётов и документов до сайта для ваших клиентов. Выберите свою задачу, попробуйте примеры и посмотрите, с какого решения и бюджета можно начать.";
+        window.scrollTo({ top: offset, behavior: 'smooth' });
+        setTimeout(() => document.getElementById('step-title').focus({preventScroll:true}), 300);
+      } else if (step === 2) {
+        document.getElementById('step-title').textContent = pathsData[currentPath].title;
+        document.getElementById('step-desc').textContent = pathsData[currentPath].desc;
+        window.scrollTo({ top: offset, behavior: 'smooth' });
+        setTimeout(() => document.getElementById('step-title').focus({preventScroll:true}), 300);
+      } else if (step === 3) {
+        document.getElementById('step-title').textContent = "Вот с чего можно начать";
+        document.getElementById('step-desc').textContent = "Ниже — возможный подход к вашей задаче и ориентир по бюджету. Детали обсудим вместе, а состав работ и окончательную стоимость согласуем до начала разработки.";
+        window.scrollTo({ top: offset, behavior: 'smooth' });
+        setTimeout(() => document.getElementById('step3-heading').focus({preventScroll:true}), 300);
+      }
+    }
+
+    function generateSolution() {
+      // Валидация перед переходом
+      const q2 = document.getElementById('q2');
+      if (q2 && q2.type === 'number') {
+          const val = Number(q2.value);
+          if (q2.value !== '' && (isNaN(val) || val < 0 || val > 168)) {
+              q2.setAttribute('aria-invalid', 'true');
+              q2.focus();
+              return; // Прерываем переход, если время некорректно
+          }
+      }
+      
+      saveDraft(); // Сохраняем черновик перед генерацией
+      const data = pathsData[currentPath];
+      const q1Val = document.getElementById('q1')?.value.trim();
+      const q2Val = document.getElementById('q2')?.value.trim();
+      const scopeEl = document.getElementById('q-scope');
+      
+      // Сборка текста задачи
+      let taskLines = [];
+      if (q1Val) taskLines.push(q1Val);
+      if (q2Val) taskLines.push(currentPath === 'automation' ? `Время: ${q2Val} ч/нед` : q2Val);
+      
+      // Сборка выбранных блоков веб-страницы
+      let webBlocks = [];
+      if (currentPath === 'web') {
+          if (document.getElementById('w-calc')?.checked) webBlocks.push('калькулятор');
+          if (document.getElementById('w-form')?.checked) webBlocks.push('форма обращения');
+          if (webBlocks.length > 0) taskLines.push(`Блоки, которые хочу обсудить: ${webBlocks.join(', ')}`);
+      }
+      
+      if (scopeEl && scopeEl.value) taskLines.push(`Формат: ${scopeEl.options[scopeEl.selectedIndex].text}`);
+      
+      document.getElementById('res-task').textContent = taskLines.length > 0 ? taskLines.join(' / ') : 'Детали уточним при обсуждении';
+      document.getElementById('res-mechanics').textContent = data.solution.mech;
+      document.getElementById('res-needs').textContent = data.solution.needs;
+      
+      // Сборка бюджета
+      const budgetData = data.getBudget(scopeEl ? scopeEl.value : null);
+      document.getElementById('res-budget').textContent = budgetData.range;
+      document.getElementById('res-budget-scope').textContent = budgetData.scope;
+      
+      const disclaimerEl = document.getElementById('budget-disclaimer');
+      if ((scopeEl && scopeEl.value === 'unknown') || currentPath === 'unknown') {
+          disclaimerEl.textContent = "Сначала уточним задачу и выберем подходящий объём. После этого смогу обозначить бюджет.";
+      } else {
+          disclaimerEl.textContent = "Ориентир относится к указанному объёму. Если понадобятся дополнительные функции или подключения, оценим их отдельно. До начала работы зафиксируем состав результата и стоимость.";
+      }
+      
+      // Генерация текста для мессенджера
+      let msg = "";
+      const noAnswer = "Уточним при обсуждении";
+      const scopeText = (scopeEl && scopeEl.value) ? scopeEl.options[scopeEl.selectedIndex].text : noAnswer;
+      
+      if (currentPath === 'tables') {
+        msg = `Здравствуйте, Ирина! Хочу сделать расчёты удобнее.\n\nМоя задача: ${q1Val || noAnswer}\nДанные сейчас находятся: ${q2Val || noAnswer}\nРассматриваю формат: ${scopeText}\nПоказанный ориентир по бюджету: ${budgetData.range}\n\nДавайте обсудим, что подойдёт для моей задачи и что нужно уточнить перед началом работы.`;
+      } else if (currentPath === 'automation') {
+        const timeLine = q2Val ? `Затраты времени: ${q2Val} ч в неделю` : `Затраты времени: ${noAnswer}`;
+        msg = `Здравствуйте, Ирина! Хочу сократить ручную работу.\n\nЧто повторяется: ${q1Val || noAnswer}\n${timeLine}\nРассматриваю объём: ${scopeText}\nПоказанный ориентир по бюджету: ${budgetData.range}\n\nДавайте посмотрим, какую часть процесса можно упростить и с чего лучше начать.`;
+      } else if (currentPath === 'web') {
+        const blocksStr = webBlocks.length > 0 ? `\nБлоки, которые хочу обсудить: ${webBlocks.join(', ')}` : '';
+        msg = `Здравствуйте, Ирина! Хочу обсудить сайт или небольшой сервис.\n\nКто будет пользоваться: ${q1Val || noAnswer}\nЧто нужно сделать удобнее: ${q2Val || noAnswer}\nРассматриваю формат: ${scopeText}${blocksStr}\nПоказанный ориентир по бюджету: ${budgetData.range}\n\nДавайте обсудим, какие функции действительно нужны и как оценить работу.`;
+      } else {
+        msg = `Здравствуйте, Ирина! Хочется сделать работу удобнее, но пока не знаю, какой инструмент выбрать.\n\nМоя ситуация: ${q1Val || noAnswer}\n\nПомогите разобраться, с чего лучше начать и какой вариант может подойти.`;
+      }
+      
+      document.getElementById('message-out').value = msg;
+      
+      goStep(3);
+    }
+
+    async function copyAndAlert() {
+      const msgArea = document.getElementById('message-out');
+      const text = msgArea.value;
+      const status = document.getElementById('copy-status');
+      
+      try {
+        await navigator.clipboard.writeText(text);
+        status.textContent = "Готово, сообщение скопировано. Вставьте его в мессенджер и отправьте Ирине.";
+      } catch (err) {
+        msgArea.select();
+        status.textContent = "Автокопирование не сработало. Сообщение выделено — скопируйте его вручную и вставьте в мессенджер.";
+      }
+    }
+  </script>
+</body>
+</html>
